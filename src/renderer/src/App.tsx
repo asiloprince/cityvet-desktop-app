@@ -15,6 +15,7 @@ import BatchDispersals from './page/dashboard/dispersal/multiple-dispersal/add/b
 import Calendar from './page/dashboard/calendar/Calendar'
 import Statistics from './page/dashboard/statistics/Statistics'
 import Prediction from './components/charts/Prediction'
+import UserManual from './components/user manual/usermanual'
 
 function App(): JSX.Element {
   return (
@@ -31,6 +32,7 @@ function App(): JSX.Element {
             <Route path="/disperse" element={<SingleDispersions />}></Route>
             <Route path="/batch-disperse" element={<BatchDispersals />}></Route>
             <Route path="/analytics" element={<Statistics />}></Route>
+            <Route path="/usermanual" element={<UserManual />}></Route>
             <Route path="/predictions" element={<Prediction />}></Route>
             <Route path="*" element={<NotFoundPage />}></Route>
           </Routes>

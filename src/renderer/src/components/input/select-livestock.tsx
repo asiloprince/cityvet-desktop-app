@@ -1,5 +1,5 @@
 import { useState, useEffect, forwardRef, useImperativeHandle } from 'react'
-import axios from 'axios'
+
 import Select from './select'
 import { MultiValue } from 'react-select'
 

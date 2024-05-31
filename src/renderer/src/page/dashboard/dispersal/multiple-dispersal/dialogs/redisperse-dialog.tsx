@@ -98,38 +98,37 @@ export default function BatchRedispersalForms({ batch }: BatchRedispersalProps) 
   ]
 
   return (
-    <div>
+    <div className="bg-white dark:bg-[#020817] dark:text-white">
+      <div className="flex justify-between px-4">
+        <div className="flex justify-between pr-4">
+          <div className="flex flex-col ">
+            <label className="block text-sm font-medium text-gray-700 my-0.5">Full Name</label>
+            <div className="border border-gray-300 p-2 rounded w-44 mt-1">
+              <p className="text-gray-700">{batch.current_beneficiary}</p>
+            </div>
+          </div>
+          <div>
+            <Dialog>
+              <DialogTrigger asChild onClick={handleAddBeneficiary}>
+                <Button variant="outline" className="ml-1 mt-7">
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </DialogTrigger>
+              {beneficiaryDialogs && <DialogContent>{beneficiaryDialogs}</DialogContent>}
+            </Dialog>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between py-6">
+          <div className="w-full border-t border-gray-300"></div>
+          <span className="text-gray-600 px-2">Redisperse Livestock</span>
+          <div className="w-full border-t border-gray-300"></div>
+        </div>
+      </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <div className="flex justify-between ">
-            <FormField
-              control={form.control}
-              name="prev_ben_id"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel htmlFor="prev_ben_id">Beneficiary ID</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="number" id="prev_ben_id" readOnly className="w-12" />
-                  </FormControl>
-                  {form.formState.errors.prev_ben_id && <FormMessage />}
-                </FormItem>
-              )}
-            />
-            <div className="flex flex-col">
-              <label className="block text-sm font-medium text-gray-700 my-0.5">Full Name</label>
-              <div className="border border-gray-300 p-2 rounded w-72 mt-1">
-                <p className="text-gray-700">{batch.current_beneficiary}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between py-6">
-              <div className="w-full border-t border-gray-300"></div>
-              <span className="text-gray-600 px-2">Redisperse</span>
-              <div className="w-full border-t border-gray-300"></div>
-            </div>
-          </div>
           <div className="flex justify-between">
             <FormField
               control={form.control}
@@ -138,28 +137,10 @@ export default function BatchRedispersalForms({ batch }: BatchRedispersalProps) 
                 <FormItem>
                   <FormLabel htmlFor="beneficiary_id">New Recipients</FormLabel>
                   <FormControl>
-                    <div className="flex justify-between">
-                      <div>
-                        {' '}
-                        <SelectBeneficiary
-                          value={String(field.value)}
-                          onChange={(value) => field.onChange(String(value))}
-                        />
-                      </div>
-
-                      <div>
-                        <Dialog>
-                          <DialogTrigger asChild onClick={handleAddBeneficiary}>
-                            <Button variant="outline" className="ml-1 mt-2">
-                              <Plus className="w-4 h-4" />
-                            </Button>
-                          </DialogTrigger>
-                          {beneficiaryDialogs && (
-                            <DialogContent>{beneficiaryDialogs}</DialogContent>
-                          )}
-                        </Dialog>
-                      </div>
-                    </div>
+                    <SelectBeneficiary
+                      value={String(field.value)}
+                      onChange={(value) => field.onChange(String(value))}
+                    />
                   </FormControl>
                   {form.formState.errors.beneficiary_id && <FormMessage />}
                 </FormItem>

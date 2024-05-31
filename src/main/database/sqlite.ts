@@ -6,7 +6,7 @@ const TAG = '[sqlite3]'
 let database: Promise<Database>
 
 export function getSqlite3(
-  filename = path.join(app.getPath('userData'), 'sqlite.db')
+  filename = path.join(app.getPath('userData'), 'cityvetdb.db')
 ): Promise<Database> {
   return (database ??= new Promise<Database>((resolve, reject) => {
     const db = new (verbose().Database)(filename, (error) => {

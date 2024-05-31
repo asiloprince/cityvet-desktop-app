@@ -7,8 +7,9 @@ import {
   DropdownMenuSeparator
 } from '../ui/dropdown-menu'
 import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
+import { downloadToExcelLivestocks } from '@renderer/lib/xlsx'
 import { Table } from '@tanstack/react-table'
-// import { downloadToExcelLivestocks } from "../../lib/xlsx";
+
 import { Download, SlidersHorizontal } from 'lucide-react'
 
 // rename toggle column names
@@ -34,7 +35,7 @@ export function DataTableViewOptionsLivestocks<TData>({ table }: DataTableViewOp
           variant="outline"
           size="sm"
           className="ml-auto hidden h-8 lg:flex"
-          onClick={() => 'downloadToExcelLivestocks()'}
+          onClick={() => downloadToExcelLivestocks()}
         >
           <Download className="mr-2 h-4 w-4" />
           Export

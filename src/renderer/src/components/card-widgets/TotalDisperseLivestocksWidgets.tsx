@@ -45,7 +45,7 @@ function TotalDisperseLivestocksWidgets(props: Props) {
 
         // Process the fetched data to fit the expected structure
         apiData.forEach((item) => {
-          const year = item.year.toString()
+          const year = item.year ? item.year.toString() : 'unknown'
           const month = item.month ? item.month.toString().padStart(2, '0') : 'unknown' // Ensure month is in 'MM' format
 
           if (!transformedData[year]) {

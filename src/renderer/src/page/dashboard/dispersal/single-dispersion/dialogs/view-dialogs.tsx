@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { DialogHeader, DialogTitle } from '../../../../../components/ui/dialog'
 import { DispersalType } from '../../../../schema'
-import axios from 'axios'
+
 import moment from 'moment'
 
 type viewProps = {
@@ -28,7 +28,19 @@ const keyNames: { [key: string]: string } = {
   barangay_name: 'Barangay',
   visit_date: 'Visit Date',
   remarks: 'Remarks',
-  visit_again: 'Visit Again'
+  visit_again: 'Visit Again',
+  recipient_beneficiaries: 'List of recipients'
+}
+// Create a separate component for the list
+const BeneficiaryList = ({ beneficiaries }: { beneficiaries: string }) => {
+  const beneficiaryArray = beneficiaries.split(',')
+  return (
+    <ol className="list-decimal list-inside">
+      {beneficiaryArray.map((beneficiary, i) => (
+        <li key={i}>{beneficiary}</li>
+      ))}
+    </ol>
+  )
 }
 
 export default function ViewDialog({ dispersal }: viewProps) {
@@ -75,7 +87,16 @@ export default function ViewDialog({ dispersal }: viewProps) {
             </div>
             {entries.map(([key, value], index) => {
               const newKey = keyNames[key] || key
-              let displayValue = value
+              let displayValue:
+                | string
+                | number
+                | React.ReactNode
+                | {
+                    visit_date: string
+                    remarks: string
+                    visit_again: 'Yes' | 'No'
+                  }[]
+                | null = value
 
               if (
                 ['redispersal_date', 'registration_date', 'dispersal_date', 'visit_date'].includes(
@@ -84,6 +105,10 @@ export default function ViewDialog({ dispersal }: viewProps) {
                 typeof value === 'string'
               ) {
                 displayValue = moment(value).format('MMMM DD, YYYY')
+              }
+
+              if (key === 'recipient_beneficiaries' && typeof value === 'string') {
+                displayValue = <BeneficiaryList beneficiaries={value} />
               }
 
               return (

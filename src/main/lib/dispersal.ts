@@ -48,6 +48,7 @@ interface DispersalInfo {
     remarks: string
     visit_again: boolean
   }>
+  recipient_beneficiaries: string[]
 }
 
 interface RedisperseLivestock {
@@ -229,8 +230,22 @@ export function handleGetDispersalInfo(
   dispersal_id: number
 ): Promise<DispersalInfo[]> {
   return new Promise((resolve, reject) => {
-    const sql =
-      'SELECT d.*, b.full_name AS current_beneficiary, pb.full_name AS previous_beneficiary, rb.full_name AS recipient, e.ear_tag, l.category, l.age, sd.init_num_heads, br.barangay_name, v.visit_date, v.remarks, v.visit_again FROM dispersals d JOIN beneficiaries b ON d.beneficiary_id = b.beneficiary_id LEFT JOIN beneficiaries pb ON d.prev_ben_id = pb.beneficiary_id LEFT JOIN beneficiaries rb ON d.recipient_id = rb.beneficiary_id JOIN single_dispersion sd ON d.dispersal_id = sd.dispersal_id JOIN livestock l ON sd.livestock_id = l.livestock_id JOIN eartags e ON l.eartag_id = e.eartag_id JOIN barangays br ON b.barangay_id = br.barangay_id JOIN visits v ON d.dispersal_id = v.dispersal_id WHERE d.dispersal_id = ? ORDER BY v.visit_date DESC'
+    const sql = `SELECT d.*, b.full_name AS current_beneficiary, pb.full_name AS previous_beneficiary, rb.full_name AS recipient, e.ear_tag, l.category, l.age, sd.init_num_heads, br.barangay_name, v.visit_date, v.remarks, v.visit_again, 
+      GROUP_CONCAT(recipient_b.full_name) AS recipient_beneficiaries
+      FROM dispersals d 
+      JOIN beneficiaries b ON d.beneficiary_id = b.beneficiary_id 
+      LEFT JOIN beneficiaries pb ON d.prev_ben_id = pb.beneficiary_id 
+      LEFT JOIN beneficiaries rb ON d.recipient_id = rb.beneficiary_id 
+      JOIN single_dispersion sd ON d.dispersal_id = sd.dispersal_id 
+      JOIN livestock l ON sd.livestock_id = l.livestock_id 
+      JOIN eartags e ON l.eartag_id = e.eartag_id 
+      JOIN barangays br ON b.barangay_id = br.barangay_id 
+      JOIN visits v ON d.dispersal_id = v.dispersal_id 
+      LEFT JOIN dispersals r ON d.beneficiary_id = r.prev_ben_id 
+      LEFT JOIN beneficiaries recipient_b ON r.beneficiary_id = recipient_b.beneficiary_id
+      WHERE d.dispersal_id = ? 
+      GROUP BY d.dispersal_id
+      ORDER BY v.visit_date DESC`
 
     db.all(sql, [dispersal_id], (err, rows: DispersalInfo[]) => {
       if (err) {
@@ -254,7 +269,6 @@ export function handleGetDispersalInfo(
     })
   })
 }
-
 interface EditDispersal {
   contract_details: string
   num_of_heads: number

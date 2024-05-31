@@ -203,6 +203,8 @@ export interface DispersalList {
   visit_date: string
   remarks: string
   visit_again: 'Not set' | 'Yes' | 'No' | undefined
+  previous_beneficiary: string
+  recipient: string
 }
 export interface BatchLivestockDispersal {
   dispersal_id: number
@@ -233,6 +235,8 @@ export interface BatchDispersalList {
   beneficiary_id: number
   current_beneficiary: string
   barangay_name: BarangayName
+  previous_beneficiary: string
+  recipient: string
 }
 
 export interface BatchDispersal {
@@ -281,6 +285,7 @@ export interface DispersalInfo {
     remarks: string
     visit_again: 'Yes' | 'No'
   }>
+  recipient_beneficiaries: string[]
 }
 
 export interface EditDispersal {

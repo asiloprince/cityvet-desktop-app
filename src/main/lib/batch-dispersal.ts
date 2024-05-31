@@ -188,8 +188,20 @@ export function handleGetBatchDispersalInfo(
   batch_id: number
 ): Promise<BatchDispersal[]> {
   return new Promise((resolve, reject) => {
-    const sql =
-      'SELECT bd.batch_id, bd.livestock_received, bd.init_num_heads,bd.age, d.*, b.full_name AS current_beneficiary,  pb.full_name AS previous_beneficiary, rb.full_name AS recipient, br.barangay_name, v.visit_date, v.remarks, v.visit_again FROM batch_dispersal bd JOIN dispersals d ON bd.dispersal_id = d.dispersal_id JOIN beneficiaries b ON d.beneficiary_id = b.beneficiary_id LEFT JOIN beneficiaries pb ON d.prev_ben_id = pb.beneficiary_id LEFT JOIN beneficiaries rb ON d.recipient_id = rb.beneficiary_id JOIN barangays br ON b.barangay_id = br.barangay_id LEFT JOIN visits v ON d.dispersal_id = v.dispersal_id WHERE bd.batch_id = ? ORDER BY v.visit_date DESC'
+    const sql = `SELECT bd.batch_id, bd.livestock_received, bd.init_num_heads, bd.age, d.*, b.full_name AS current_beneficiary, pb.full_name AS previous_beneficiary, rb.full_name AS recipient, br.barangay_name, v.visit_date, v.remarks, v.visit_again, 
+    GROUP_CONCAT(DISTINCT recipient_b.full_name) AS recipient_beneficiaries
+      FROM batch_dispersal bd 
+      JOIN dispersals d ON bd.dispersal_id = d.dispersal_id 
+      JOIN beneficiaries b ON d.beneficiary_id = b.beneficiary_id 
+      LEFT JOIN beneficiaries pb ON d.prev_ben_id = pb.beneficiary_id 
+      LEFT JOIN beneficiaries rb ON d.recipient_id = rb.beneficiary_id 
+      JOIN barangays br ON b.barangay_id = br.barangay_id 
+      LEFT JOIN visits v ON d.dispersal_id = v.dispersal_id 
+      LEFT JOIN dispersals r ON d.beneficiary_id = r.prev_ben_id 
+      LEFT JOIN beneficiaries recipient_b ON r.beneficiary_id = recipient_b.beneficiary_id
+      WHERE bd.batch_id = ? 
+      GROUP BY bd.batch_id
+      ORDER BY v.visit_date DESC`
 
     db.all(sql, [batch_id], (err, rows: BatchDispersal[]) => {
       if (err) {

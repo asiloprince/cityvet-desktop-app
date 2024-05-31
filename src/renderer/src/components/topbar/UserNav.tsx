@@ -13,6 +13,7 @@ import { Link } from 'react-router-dom'
 
 import { Button } from '../ui/button'
 import { useTheme } from 'next-themes'
+import { FaQuestionCircle } from 'react-icons/fa'
 
 export function UserNav(): JSX.Element {
   const { theme, setTheme } = useTheme()
@@ -88,12 +89,12 @@ export function UserNav(): JSX.Element {
               <span>Dashboard</span>
             </Link>
           </DropdownMenuItem>
-          {/* <DropdownMenuItem>
-            <Settings className="mr-2 h-4 w-4" />
-            <Link to={'/settings'}>
-              <span>Settings</span>
+          <DropdownMenuItem>
+            <FaQuestionCircle className="mr-2 h-4 w-4" />
+            <Link to={'/usermanual'}>
+              <span>User Manual</span>
             </Link>
-          </DropdownMenuItem> */}
+          </DropdownMenuItem>
         </DropdownMenuGroup>
         {/* <DropdownMenuSeparator />
         <DropdownMenuSeparator />

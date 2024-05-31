@@ -51,7 +51,6 @@ const livestockTypesOptions: Option[] = [
 
 const livestockCategoryOptions: Option[] = [
   { value: 'Cattle', label: 'Cattle' },
-  { value: 'CPDO Cattle', label: 'CPDO Cattle' },
   { value: 'Goat', label: 'Goat' },
   { value: 'Goat - Doe', label: 'Goat - Doe' },
   { value: 'Goat - Buck', label: 'Goat - Buck' }

@@ -56,17 +56,36 @@ import {
   handleTotalDispersalAndRedispersal,
   handleTotalLivestockForEachType
 } from './lib/kpi'
+import { createRedispersalTable } from './database/models/redispersal'
 
 // For sqlite3 initialize of Renderer process
 ipcMain.handle('get-database-path', () => path.join(app.getPath('userData'), 'sqlite.db'))
 
 function createWindow(): void {
+  // Create the splash screen window
+  const splash = new BrowserWindow({
+    width: 500,
+    height: 300,
+    transparent: true,
+    frame: false,
+    alwaysOnTop: true,
+    webPreferences: {
+      sandbox: false,
+      contextIsolation: true
+    }
+  })
+
+  splash.loadFile(join(__dirname, '../../resources/splash.html'))
+  splash.center()
+
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 1200,
+    height: 800,
+    icon: path.join(__dirname, '../../resources/logo.ico'),
     show: false,
     autoHideMenuBar: true,
+
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -76,9 +95,11 @@ function createWindow(): void {
   })
 
   mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
+    setTimeout(() => {
+      splash.close()
+      mainWindow.show()
+    }, 3000)
   })
-
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
@@ -326,30 +347,9 @@ app.whenReady().then(() => {
     createVisitsTable(database).then(() => {
       console.log('Visit Table Created')
     })
-
-    handleGetLivestockInfo(database, 1) // replace 1 with a known livestock_id
-      .then((livestock) => {
-        console.log('Fetched info data:', livestock)
-      })
-      .catch((error) => {
-        console.error('Error fetching beneficiary info:', error)
-      })
-
-    handleTotalDispersalAndRedispersal(database)
-      .then((total) => {
-        console.log('Total Dispersal and Redispersal:', total)
-      })
-      .catch((error) => {
-        console.error('Error fetching total dispersal and redispersal data:', error)
-      })
-
-    handleDispersalsPrediction(database)
-      .then((predictionData) => {
-        console.log('Dispersal Prediction Data:', predictionData)
-      })
-      .catch((error) => {
-        console.error('Error fetching dispersal prediction data:', error)
-      })
+    createRedispersalTable(database).then(() => {
+      console.log('Redispersal Table Created')
+    })
   })
 })
 

@@ -1,9 +1,7 @@
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-
 import Select from 'react-select'
-
 import { inputBarangays } from '../input/barangay-input'
 import { toast } from 'react-toastify'
 import { DialogHeader, DialogTitle } from '@renderer/components/ui/dialog'
@@ -60,6 +58,7 @@ export default function AddNewBeneficiaryForm(): JSX.Element {
     try {
       await window.context.addNewBeneficiaryForm(data)
       toast.success('Beneficiary added successfully!')
+      form.reset()
     } catch (err) {
       console.log(err)
       toast.error('An error occurred while adding the beneficiary.')
@@ -138,7 +137,7 @@ export default function AddNewBeneficiaryForm(): JSX.Element {
             name="barangay_id"
             render={({ field }) => (
               <FormItem>
-                <FormLabel htmlFor="barangay_id">Barangay ID</FormLabel>
+                <FormLabel htmlFor="barangay_id">Barangay</FormLabel>
                 <FormControl>
                   <Select
                     inputId="barangay_id"

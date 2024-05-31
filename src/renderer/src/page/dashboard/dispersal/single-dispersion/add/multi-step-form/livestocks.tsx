@@ -1,7 +1,6 @@
 import { useForm } from 'react-hook-form'
 import { useFormState } from '../../../context/form-context'
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import Select from '@renderer/components/input/select'
 
 type TFormValues = {
