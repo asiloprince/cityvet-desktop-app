@@ -592,3 +592,64 @@ export async function handleBatchRedispersals(
     })
   })
 }
+
+// interface BatchDispersalChainInfo {
+//   batch_id: number
+//   current_beneficiary: string
+//   previous_beneficiary: string
+//   recipient: string
+//   recipient_dispersals: BatchDispersalChainInfo[]
+// }
+
+// interface DispersalRow {
+//   batch_id: number
+//   beneficiary_id: number
+//   prev_ben_id: number | null
+//   recipient_id: number | null
+//   beneficiary_name: string
+//   prev_ben_name: string | null
+//   recipient_name: string | null
+// }
+// export function getBatchDispersalChain(
+//   db: Database,
+//   batch_id: number
+// ): Promise<BatchDispersalChainInfo[]> {
+//   return new Promise((resolve, reject) => {
+//     const query = `
+//       SELECT
+//         bd.batch_id,
+//         b.full_name AS beneficiary_name,
+//         pb.full_name AS prev_ben_name,
+//         rb.full_name AS recipient_name,
+//         d.prev_ben_id,
+//         d.recipient_id
+//       FROM batch_dispersal bd
+//       JOIN dispersals d ON bd.dispersal_id = d.dispersal_id
+//       JOIN beneficiaries b ON d.beneficiary_id = b.beneficiary_id
+//       LEFT JOIN beneficiaries pb ON d.prev_ben_id = pb.beneficiary_id
+//       LEFT JOIN beneficiaries rb ON d.recipient_id = rb.beneficiary_id
+//       WHERE bd.batch_id = ?
+//     `
+
+//     db.all(query, [batch_id], (err, rows: DispersalRow[]) => {
+//       if (err) {
+//         console.error('Failed to get dispersal chain:', err.message)
+//         reject(err)
+//       } else {
+//         const dispersalMap = new Map<number, BatchDispersalChainInfo>()
+//         rows.forEach((row: DispersalRow) => {
+//           dispersalMap.set(row.batch_id, {
+//             batch_id: row.batch_id,
+//             current_beneficiary: row.beneficiary_name,
+//             previous_beneficiary: row.prev_ben_name || '',
+//             recipient: row.recipient_name || '',
+//             recipient_dispersals: []
+//           })
+//         })
+
+//         const chainNodes = Array.from(dispersalMap.values())
+//         resolve(chainNodes)
+//       }
+//     })
+//   })
+// }

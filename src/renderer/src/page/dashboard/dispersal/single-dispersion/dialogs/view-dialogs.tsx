@@ -3,6 +3,7 @@ import { DialogHeader, DialogTitle } from '../../../../../components/ui/dialog'
 import { DispersalType } from '../../../../schema'
 
 import moment from 'moment'
+import { DispersalChainInfo } from '@shared/model'
 
 type viewProps = {
   dispersal: DispersalType
@@ -43,8 +44,18 @@ const BeneficiaryList = ({ beneficiaries }: { beneficiaries: string }) => {
   )
 }
 
+// Function to get redispersal movement
+function getRedispersalMovement(dispersalChain: DispersalChainInfo): string {
+  let movement = dispersalChain.current_beneficiary
+  dispersalChain.recipient_dispersals.forEach((dispersal) => {
+    movement += ' > ' + getRedispersalMovement(dispersal)
+  })
+  return movement
+}
+
 export default function ViewDialog({ dispersal }: viewProps) {
   const [dispersalDetails, setDispersalDetails] = useState<DispersalType | null>(null)
+  const [dispersalChain, setDispersalChain] = useState<DispersalChainInfo[]>([])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,6 +66,9 @@ export default function ViewDialog({ dispersal }: viewProps) {
         } else {
           console.error('No dispersal found with the provided ID')
         }
+
+        const chainData = await window.context.getDispersalChain(dispersal.dispersal_id)
+        setDispersalChain(chainData)
       } catch (err) {
         console.error('Error:', err)
       }
@@ -143,6 +157,14 @@ export default function ViewDialog({ dispersal }: viewProps) {
               className="w-full h-20 p-2 border rounded-md mt-2"
               value={notes}
             />
+          </div>
+          <div className="mt-4">
+            <h2 className="font-bold text-lg">Redispersal Movement</h2>
+            {dispersalChain.length > 0 && dispersalChain[0].current_beneficiary ? (
+              <p>{getRedispersalMovement(dispersalChain[0])}</p>
+            ) : (
+              <p>No redispersal movement found.</p>
+            )}
           </div>
         </div>
       </div>

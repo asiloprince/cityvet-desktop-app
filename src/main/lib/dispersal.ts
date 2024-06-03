@@ -708,7 +708,7 @@ export async function handleRedispersalStarter(
               dispersal.beneficiary_id,
               notes
             ]
-            const newDispersalId = await new Promise<number>((resolve, reject) => {
+            const newdispersal_id = await new Promise<number>((resolve, reject) => {
               db.run(insertSql, insertValues, function (err) {
                 if (err) {
                   reject(err)
@@ -721,7 +721,7 @@ export async function handleRedispersalStarter(
             const visitSql =
               'INSERT INTO visits (dispersal_id, visit_date, remarks, visit_again, is_default) VALUES (?, ?, ?, ?, ?)'
             const visitValues = [
-              newDispersalId,
+              newdispersal_id,
               new Date().toISOString(),
               '(No Remarks)',
               'Not set',
@@ -749,7 +749,7 @@ export async function handleRedispersalStarter(
               num_of_heads
             }
 
-            await transferLivestock(db, transferPayload, newDispersalId)
+            await transferLivestock(db, transferPayload, newdispersal_id)
 
             db.run('COMMIT;', (err) => {
               if (err) {
@@ -782,4 +782,93 @@ export async function handleRedispersalStarter(
       message: 'There was an error saving dispersal information.'
     }
   }
+}
+
+interface DispersalChainInfo {
+  dispersal_id: number
+  current_beneficiary: string
+  previous_beneficiary: string
+  recipient: string
+  recipient_dispersals: DispersalChainInfo[]
+}
+
+interface DispersalRow {
+  dispersal_id: number
+  beneficiary_id: number
+  prev_ben_id: number | null
+  recipient_id: number | null
+  beneficiary_name: string
+  prev_ben_name: string | null
+  recipient_name: string | null
+}
+export function getDispersalChain(
+  db: Database,
+  dispersalId: number
+): Promise<DispersalChainInfo[]> {
+  return new Promise((resolve, reject) => {
+    const query = `
+      WITH RECURSIVE dispersal_chain AS (
+        SELECT
+          d.dispersal_id,
+          b.full_name AS beneficiary_name,
+          pb.full_name AS prev_ben_name,
+          rb.full_name AS recipient_name,
+          d.prev_ben_id,
+          d.recipient_id
+        FROM dispersals d
+        JOIN beneficiaries b ON d.beneficiary_id = b.beneficiary_id
+        LEFT JOIN beneficiaries pb ON d.prev_ben_id = pb.beneficiary_id
+        LEFT JOIN beneficiaries rb ON d.recipient_id = rb.beneficiary_id
+        WHERE d.dispersal_id = ?
+        
+        UNION ALL
+        
+        SELECT 
+          d2.dispersal_id,
+          b2.full_name AS beneficiary_name,
+          pb2.full_name AS prev_ben_name,
+          rb2.full_name AS recipient_name,
+          d2.prev_ben_id,
+          d2.recipient_id
+        FROM dispersals d2
+        JOIN beneficiaries b2 ON d2.beneficiary_id = b2.beneficiary_id
+        LEFT JOIN beneficiaries pb2 ON d2.prev_ben_id = pb2.beneficiary_id
+        LEFT JOIN beneficiaries rb2 ON d2.recipient_id = rb2.beneficiary_id
+        INNER JOIN dispersal_chain dc ON dc.recipient_id = d2.beneficiary_id
+      )
+      SELECT * FROM dispersal_chain;
+    `
+
+    db.all(query, [dispersalId], (err, rows: DispersalRow[]) => {
+      if (err) {
+        console.error('Failed to get dispersal chain:', err.message)
+        reject(err)
+      } else {
+        const dispersalMap = new Map<number, DispersalChainInfo>()
+        rows.forEach((row: DispersalRow) => {
+          dispersalMap.set(row.dispersal_id, {
+            dispersal_id: row.dispersal_id,
+            current_beneficiary: row.beneficiary_name,
+            previous_beneficiary: row.prev_ben_name || '',
+            recipient: row.recipient_name || '',
+            recipient_dispersals: []
+          })
+        })
+
+        rows.forEach((row: DispersalRow) => {
+          if (row.prev_ben_id) {
+            const parentDispersal = Array.from(dispersalMap.values()).find(
+              (dispersal) => dispersal.current_beneficiary === row.prev_ben_name
+            )
+            if (parentDispersal) {
+              parentDispersal.recipient_dispersals.push(dispersalMap.get(row.dispersal_id)!)
+            }
+          }
+        })
+
+        const chainNode = dispersalMap.get(dispersalId)
+        resolve(chainNode ? [chainNode] : [])
+      }
+    })
+  })
 }

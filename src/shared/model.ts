@@ -381,3 +381,17 @@ export interface DispersalAndRedispersalData {
   status: string
   total: number
 }
+export interface DispersalChainInfo {
+  dispersal_id: number
+  current_beneficiary: string
+  previous_beneficiary: string
+  recipient: string
+  recipient_dispersals: DispersalChainInfo[]
+}
+export interface BatchDispersalChainInfo {
+  dispersal_id: number
+  current_beneficiary: string
+  previous_beneficiary: string
+  recipient: string
+  recipient_dispersals: DispersalChainInfo[]
+}

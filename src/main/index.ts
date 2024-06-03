@@ -30,6 +30,7 @@ import { createDispersalsTable } from './database/models/dispersal'
 import { createSingleDispersionTable } from './database/models/single-dispersion'
 import { createBatchDispersalTable } from './database/models/batch-dispersal'
 import {
+  getDispersalChain,
   handleDeleteDispersalRecord,
   handleGetDispersalInfo,
   handleGetDispersalList,
@@ -215,6 +216,17 @@ app.whenReady().then(() => {
     const db = await getSqlite3()
     return handleGetDispersalInfo(db, dispersal_id)
   })
+  // get dispersal chain
+  ipcMain.handle('get-dispersal-chain', async (_, dispersal_id) => {
+    const db = await getSqlite3()
+    return getDispersalChain(db, dispersal_id)
+  })
+  // // get batch dispersal chain
+  // ipcMain.handle('get-batch-dispersal-chain', async (_, batch_id) => {
+  //   const db = await getSqlite3()
+  //   return getBatchDispersalChain(db, batch_id)
+  // })
+
   // update
   ipcMain.handle('update-dispersal', async (_, dispersal_id, payload) => {
     const db = await getSqlite3()
@@ -350,6 +362,16 @@ app.whenReady().then(() => {
     createRedispersalTable(database).then(() => {
       console.log('Redispersal Table Created')
     })
+
+    // Fetch and log the dispersal chain for a specific beneficiary ID
+    const dispersal_id = 1 // Replace with the actual dispersal ID you want to fetch
+    getDispersalChain(database, dispersal_id)
+      .then((dispersalChain) => {
+        console.log('Dispersal Chain:', JSON.stringify(dispersalChain, null, 2))
+      })
+      .catch((error) => {
+        console.error('Failed to fetch dispersal chain:', error)
+      })
   })
 })
 

@@ -1,5 +1,6 @@
 import {
   BatchDispersal,
+  BatchDispersalChainInfo,
   BatchDispersalList,
   BatchLivestockDispersal,
   Beneficiary,
@@ -47,6 +48,7 @@ declare global {
       DispersedLivestockList: () => Promise<DispersalList[]>
       fetchDispersalInfo: (dispersal_id: number) => Promise<DispersalInfo[]>
       updateDispersal: (dispersal_id: number, data: EditDispersal) => void
+      getDispersalChain: (dispersal_id: number) => Promise<DispersalChainInfo[]>
       redisperseOffspring: (data: RedisperseLivestock) => Promise<void>
       deleteDispersal: (dispersal_id: number) => void
       redisperseStarter: (
@@ -57,6 +59,7 @@ declare global {
       BatchDispersal: (data: BatchLivestockDispersal) => void
       BatchDispersedLivestockList: () => Promise<BatchDispersalList[]>
       fetchBatchDispersalInfo: (batch_id: number) => Promise<BatchDispersal[]>
+      // getBatchDispersalChain: (batch_id: number) => Promise<BatchDispersalChainInfo[]>
       updateBatchDispersal: (batch_id: number, data: UpdateBatchDispersal) => void
       batchRedispersal: (data: RedisperseBatchDispersal) => void
       deleteBatchDispersal: (dispersal_id: number) => void

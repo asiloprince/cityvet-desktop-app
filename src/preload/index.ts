@@ -1,11 +1,13 @@
 import {
   BatchDispersal,
+  BatchDispersalChainInfo,
   BatchDispersalList,
   BatchLivestockDispersal,
   Beneficiary,
   BeneficiaryInfo,
   DispersalAndRedispersalCount,
   DispersalAndRedispersalData,
+  DispersalChainInfo,
   DispersalInfo,
   DispersalList,
   DispersalLivestock,
@@ -118,6 +120,13 @@ const api = {
   deleteDispersal: async (dispersal_id: number): Promise<void> => {
     ipcRenderer.invoke('delete-dispersal', dispersal_id)
   },
+
+  getDispersalChain: async (dispersal_id: number): Promise<DispersalChainInfo[]> => {
+    return ipcRenderer.invoke('get-dispersal-chain', dispersal_id)
+  },
+  // getBatchDispersalChain: async (batch_id: number): Promise<BatchDispersalChainInfo[]> => {
+  //   return ipcRenderer.invoke('get-batch-dispersal-chain', batch_id)
+  // },
 
   // disperse livestock
   BatchDispersal: async (data: BatchLivestockDispersal): Promise<void> => {
